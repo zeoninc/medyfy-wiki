@@ -30,7 +30,7 @@ function getUiConfig() {
             },
             signInFailure: (error: firebaseui.auth.AuthUIError): Promise<void> | void => {
                 // TODO: provide proper error msg on login error
-                console.log('auth error', error);
+                console.log('Authentication error', error);
             },
         },
         // Opens IDP Providers sign-in flow in a popup.
@@ -173,22 +173,54 @@ const handleSignedInUser = async function (user: firebase.User) {
             (namespacedTiddler) => Object.assign({}, namespacedTiddler.tiddler, namespacedTiddler.tiddler.fields),
             namespacedTiddlers,
         ) as TW5TiddlerFields[];
-    } catch (err) {
-        const lacksPermission =
-            err.response.status === 403 &&
-            (!firebaseAuthTokenData.claims.hasOwnProperty('_' + effectiveConfig.wikiName) ||
-                firebaseAuthTokenData.claims['_' + effectiveConfig.wikiName] < 2);
-        if (lacksPermission) {
-            // This is a terrible hack: abuse the TW5 built in error popup to notify the user of lack of permissions
-            $tw.language = { getString: (label) => (label === 'Buttons/Close/Caption' ? 'close' : '') };
-            $tw.utils.error(
-                `Hi ${user.displayName}! It seems like you do not have sufficient permissions to access wiki ${effectiveConfig.wikiName}. If this is your first time logging in or you have recently been given access, try reloading the page.`,
-            );
-        } else {
+    } 
+    //code added by Otis Zeon
+    catch (err: unknown) {
+        // First, check if the error is an instance of Error and has a 'response' property
+        if (typeof err === 'object' && err !== null && 'response' in err) {
+            const error = err as { response: { status: number; }, message: string };
+    
+            const lacksPermission =
+                error.response.status === 403 &&
+                (!firebaseAuthTokenData.claims.hasOwnProperty('_' + effectiveConfig.wikiName) ||
+                    firebaseAuthTokenData.claims['_' + effectiveConfig.wikiName] < 2);
+    
+            if (lacksPermission) {
+                // Handle lack of permissions
+                $tw.language = { getString: (label) => (label === 'Buttons/Close/Caption' ? 'Close' : '') };
+                $tw.utils.error(
+                    `Hi ${user.displayName}! It seems like you do not have sufficient permissions to access wiki ${effectiveConfig.wikiName}. If this is your first time logging in or you have recently been given access, try reloading the page.`,
+                );
+            } else {
+                // Handle other errors
+                $tw.utils.error(error.message);
+            }
+        } else if (err instanceof Error) {
+            // Handle generic error if err is an Error object but doesn't have a 'response' property
             $tw.utils.error(err.message);
+        } else {
+            // Handle other types of unknown errors
+            $tw.utils.error("An unknown error occurred.");
         }
         return;
     }
+    
+    // catch (err) {
+    //     const lacksPermission =
+    //         err.response.status === 403 &&
+    //         (!firebaseAuthTokenData.claims.hasOwnProperty('_' + effectiveConfig.wikiName) ||
+    //             firebaseAuthTokenData.claims['_' + effectiveConfig.wikiName] < 2);
+    //     if (lacksPermission) {
+    //         // This is a terrible hack: abuse the TW5 built in error popup to notify the user of lack of permissions
+    //         $tw.language = { getString: (label) => (label === 'Buttons/Close/Caption' ? 'close' : '') };
+    //         $tw.utils.error(
+    //             `Hi ${user.displayName}! It seems like you do not have sufficient permissions to access wiki ${effectiveConfig.wikiName}. If this is your first time logging in or you have recently been given access, try reloading the page.`,
+    //         );
+    //     } else {
+    //         $tw.utils.error(err.message);
+    //     }
+    //     return;
+    // }
     // save tiddlers for direct access from synacadapter
     // TODO:
     ($tw as any)._pnwiki.namespacedTiddlers = namespacedTiddlers;
@@ -326,5 +358,6 @@ const initApp = () => {
     (document.querySelector('input[name="emailSignInMethod"][value="' + getEmailSignInMethod() + '"]') as any).checked =
         true;
 };
+
 
 window.addEventListener('load', initApp);

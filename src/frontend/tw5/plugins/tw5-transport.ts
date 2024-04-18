@@ -46,13 +46,22 @@ export class TW5Transport implements HTTPTransport {
                             throw new Error('TW5Transport received no body in HTTP response');
                         }
                         resolve(JSON.parse(data[0]));
-                    } catch (e) {
-                        reject(
-                            new NetworkError({
-                                message: e.message,
-                                apiRequest,
-                            }),
-                        );
+                    } catch (e: unknown) {
+                        if (e instanceof Error) {
+                            reject(
+                                new NetworkError({
+                                    message: e.message,
+                                    apiRequest,
+                                })
+                            );
+                        } else {
+                            reject(
+                                new NetworkError({
+                                    message: 'Unknown error occurred',
+                                    apiRequest,
+                                })
+                            );
+                        }
                     }
                 },
             });

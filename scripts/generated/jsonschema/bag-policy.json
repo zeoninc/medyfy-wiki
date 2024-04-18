@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/BagPolicy",
+  "definitions": {
+    "BagPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "read": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Grantee"
+          }
+        },
+        "write": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Grantee"
+          }
+        }
+      },
+      "required": [
+        "read",
+        "write"
+      ]
+    },
+    "Grantee": {
+      "anyOf": [
+        {
+          "$ref": "#/definitions/UserId"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "role": {
+              "$ref": "#/definitions/ROLE"
+            }
+          },
+          "required": [
+            "role"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "UserId": {
+      "anyOf": [
+        {
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "userId"
+          ],
+          "additionalProperties": false
+        },
+        {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "email"
+          ],
+          "additionalProperties": false
+        }
+      ]
+    },
+    "ROLE": {
+      "type": "number",
+      "enum": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  }
+}

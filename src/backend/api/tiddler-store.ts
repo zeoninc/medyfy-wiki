@@ -197,11 +197,17 @@ class TiddlerStoreImpl implements TiddlerStore {
             }
             this.logger.info(`tiddler-store.ts:deleteFromBag(): about to delete ${title}`)
             try {
-              const result = await persistence.removeTiddler({ wiki: this.wiki, bag }, title, expectedRevision);
-              return result.existed;
-            } catch (e) {
-              this.logger.error(e.stack);
-              throw e;
+            const result = await persistence.removeTiddler({ wiki: this.wiki, bag }, title, expectedRevision);
+            return result.existed;
+            } catch (e: unknown) {
+            if (e instanceof Error) {
+                // Safe to access e.stack because e is confirmed to be an instance of Error
+                this.logger.error(e.stack);
+            } else {
+                // If e is not an instance of Error, log a generic message or do other handling as appropriate
+                this.logger.error("An unexpected error occurred.");
+            }
+            throw e; // Rethrow the error to handle it further up the call stack if necessary
             }
         });
     }

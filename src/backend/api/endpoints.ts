@@ -116,28 +116,56 @@ export class APIEndpointFactory {
         });
     }
 
-    private async remove(req: express.Request) {
+    // private async remove(req: express.Request) {
+    //     this.assertWikiInPath(req.params);
+    //     const wiki = decodeURIComponent(req.params['wiki']);
+    //     const bag = decodeURIComponent(req.params['bag']);
+    //     const title = decodeURIComponent(req.params['title']);
+    //     const expectedRevision = decodeURIComponent(req.params['revision']);
+    //     if (wiki && bag && title && expectedRevision) {
+    //         const store = this.tiddlerStoreFactory.createTiddlerStore(req.user, wiki);
+    //         this.logger.info(`about to delete ${title}`)
+    //         try {
+    //           const result = await store.deleteFromBag(bag, title, expectedRevision);
+    //           return result;
+    //         } catch (e) {
+    //           this.logger.error(`error deleting ${title}`, e.stack);
+    //         }
+    //     }
+    //     throw new TW5FirebaseError({
+    //         code: TW5FirebaseErrorCode.BAD_REQUEST_PARAMS,
+    //         data: { params: req.params },
+    //     });
+    // }
+    private async remove(req: express.Request): Promise<any> {
         this.assertWikiInPath(req.params);
         const wiki = decodeURIComponent(req.params['wiki']);
         const bag = decodeURIComponent(req.params['bag']);
         const title = decodeURIComponent(req.params['title']);
         const expectedRevision = decodeURIComponent(req.params['revision']);
+
         if (wiki && bag && title && expectedRevision) {
             const store = this.tiddlerStoreFactory.createTiddlerStore(req.user, wiki);
-            this.logger.info(`about to delete ${title}`)
+            this.logger.info(`about to delete ${title}`);
             try {
-              const result = await store.deleteFromBag(bag, title, expectedRevision);
-              return result;
-            } catch (e) {
-              this.logger.error(`error deleting ${title}`, e.stack);
+                const result = await store.deleteFromBag(bag, title, expectedRevision);
+                return result;
+            } catch (e: unknown) {
+                if (e instanceof Error) {
+                    // Log the error message and stack if it is an instance of Error
+                    this.logger.error(`error deleting ${title}: ${e.message}`, e.stack);
+                } else {
+                    // Handle cases where e might not be an Error object
+                    this.logger.error(`error deleting ${title}: Unknown error occurred.`);
+                }
             }
         }
+
         throw new TW5FirebaseError({
             code: TW5FirebaseErrorCode.BAD_REQUEST_PARAMS,
             data: { params: req.params },
         });
     }
-
     private bindAndSerialize(fn: (req: express.Request) => Promise<any>) {
         const boundFn = fn.bind(this);
         return (req: express.Request, res: express.Response, next: any) => {

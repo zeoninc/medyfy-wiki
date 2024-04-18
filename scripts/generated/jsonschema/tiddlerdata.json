@@ -1,0 +1,30 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/PartialTiddlerData",
+  "definitions": {
+    "PartialTiddlerData": {
+      "type": "object",
+      "properties": {
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "text": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "fields": {
+          "$ref": "#/definitions/TiddlerFields"
+        }
+      },
+      "additionalProperties": false
+    },
+    "TiddlerFields": {
+      "type": "object"
+    }
+  }
+}

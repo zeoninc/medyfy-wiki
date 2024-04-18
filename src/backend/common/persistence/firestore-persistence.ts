@@ -173,7 +173,6 @@ export class FirestorePersistence implements TiddlerPersistence {
         this.tx.set(this.db.doc(makeKey(namespace, title)), this.toFirestoreTiddler(tiddler, revision));
         return { tiddler, revision };
     }
-
     async removeTiddler(
         namespace: TiddlerNamespace,
         title: string,
@@ -187,13 +186,40 @@ export class FirestorePersistence implements TiddlerPersistence {
         try {
           this.tx.delete(this.db.doc(makeKey(namespace, title)));
           this.logger.info(`tx contains delete call for ${title}`);
-        } catch (e) {
-          this.logger.error(`error deleting tiddler ${title}`, e.stack);
+        } catch (e: unknown) {
+          // Use a type guard to check if 'e' is an instance of Error
+          if (e instanceof Error) {
+            this.logger.error(`error deleting tiddler ${title}: ${e.stack}`);
+          } else {
+            // If 'e' is not an Error, you might want to handle it differently
+            this.logger.error(`unexpected error type encountered when deleting tiddler ${title}`);
+          }
           throw e;
         }
-
+    
         return { existed: true };
     }
+    
+    // async removeTiddler(
+    //     namespace: TiddlerNamespace,
+    //     title: string,
+    //     expectedRevision?: string,
+    // ): Promise<{ existed: boolean }> {
+    //     const doc = await this.revisionCheck(namespace, title, expectedRevision);
+    //     if (!doc) {
+    //         return { existed: false };
+    //     }
+    //     this.logger.info(`firestore-persistence: about to delete ${title}`);
+    //     try {
+    //       this.tx.delete(this.db.doc(makeKey(namespace, title)));
+    //       this.logger.info(`tx contains delete call for ${title}`);
+    //     } catch (e) {
+    //       this.logger.error(`error deleting tiddler ${title}`, e.stack);
+    //       throw e;
+    //     }
+
+    //     return { existed: true };
+    // }
 
     async createTiddler(namespace: TiddlerNamespace, tiddler: Tiddler, revision: Revision): Promise<void> {
         if ((await this.readTiddlers([{ namespace, title: tiddler.title }])).length > 0) {

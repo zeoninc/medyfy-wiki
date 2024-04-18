@@ -1,0 +1,84 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Recipes",
+  "definitions": {
+    "Recipes": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/definitions/Recipe"
+      }
+    },
+    "Recipe": {
+      "type": "object",
+      "properties": {
+        "read": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "bag": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bag"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "variable": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "variable"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "write": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "bag": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "bag"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "variable": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "variable"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "read",
+        "write"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

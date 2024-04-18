@@ -1,0 +1,20 @@
+{
+    "deploy": {
+        "apiRegion": "europe-west3",
+        "targets": "hosting,functions,firestore:rules,storage:rules"
+    },
+    "wiki": {
+        "wikiName": "medyfy-wiki",
+        "recipe": "default",
+        "apiEndpoint": "https://europe-west3-peterneumark-com.cloudfunctions.net/wiki-app/"
+    },
+    "firebase": {
+        "apiKey": "AIzaSyAa7TWBe17UQA1snSkCOsPdwFafpd4_1H4",
+        "authDomain": "medyfy-com.firebaseapp.com",
+        "databaseURL": "https://medyfy-com.firebaseio.com",
+        "projectId": "medyfy-com",
+        "storageBucket": "medyfy-com.appspot.com",
+        "messagingSenderId": "996053019240",
+        "appId": "1:996053019240:web:955119ddd05f9c335be9dd"
+    }
+}

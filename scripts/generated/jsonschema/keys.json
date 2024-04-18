@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$ref": "#/definitions/Keys",
+  "definitions": {
+    "Keys": {
+      "type": "object",
+      "properties": {
+        "firebaseToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "firebaseToken",
+        "refreshToken"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
